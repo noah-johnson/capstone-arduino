@@ -1,0 +1,121 @@
+//in the main code
+
+NfcTag tag = nfc.read();
+tag.print(); // this is the first print, prints using object tag
+
+
+//in NfcTag.cpp
+NfcTag::NfcTag()
+
+{
+
+    _uid = 0;
+
+    _uidLength = 0;
+
+    _tagType = "Unknown";
+
+    _ndefMessage = (NdefMessage*)NULL;
+
+}
+
+//function void NfcTag::print()
+
+Serial.print(...);
+Serial.print(...);
+
+If (_ndefMessage == NULL)
+{
+	Serial.println(F("\nNo NDEF Message"));
+}
+else
+{
+	_ndefMessage->print(); //prints using the _ndefMessage object
+}
+
+//In NdefMessage.cpp
+//object NdefRecord _record helps retrive the data
+NdefRecord _records[MAX_NDEF_RECORDS];
+
+void NdefMessage::print()
+
+{
+
+	Serial.print(F("\nNDEF Message "));
+	Serial.print(_recordCount);
+	Serial.print(F(" record"));
+
+	_recordCount == 1 ? Serial.print(", ") : Serial.print("s, ");
+
+	Serial.print(getEncodedSize());Serial.println(F(" bytes"));
+
+
+	int i;
+
+	for (i = 0; i < _recordCount; i++)
+
+	{
+
+	_records[i].print();
+
+	}
+
+}
+
+//In NdefRecord.cpp
+//_payload stores the pointer to a byte in memory
+void NdefRecord::print()
+{
+	Serial.println(F("  NDEF Record"));
+
+	Serial.print(F("    TNF 0x"));Serial.print(_tnf, HEX);Serial.print(" ");
+	...
+	PrintHexChar(_payload, _payloadLength); //prints the characters into the monitor, _payloadLength is a long that stores how long the payload is in number of bytes
+	...
+}
+
+//PrintHexChar is a function in Ndef.cpp
+void PrintHexChar(const byte * data, const long numBytes)
+{
+  uint32_t szPos;
+
+  for (szPos=0; szPos < numBytes; szPos++)
+
+  {
+
+    // Append leading 0 for small values
+
+    if (data[szPos] <= 0xF)
+
+      Serial.print("0");
+
+    Serial.print(data[szPos], HEX);
+
+    if ((numBytes > 1) && (szPos != numBytes - 1))
+
+    {
+
+      Serial.print(" ");
+
+    }
+
+  }
+
+  Serial.print("  ");
+
+  for (szPos=0; szPos < numBytes; szPos++)
+
+  {
+
+    if (data[szPos] <= 0x1F)
+
+      Serial.print(".");
+
+    else
+
+      Serial.print((char)data[szPos]);
+
+  }
+
+  Serial.println("");
+}
